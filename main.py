@@ -1,21 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from models import Block
+
 import time
 
 app = FastAPI()
 
 
 blockchain = []
-
-
-class Block(BaseModel):
-    index: int
-    timestamp: float
-    transactions: List[str]
-    previousHash: str
-    hash: str
-    nonce: int
 
 
 @app.get("/")
@@ -43,6 +34,4 @@ if __name__ == "__main__":
     import uvicorn
 
     print("Starting blockchain peer node...")
-    uvicorn.run(app, host="0.0.0.0", port=3000)
-
-# uvicorn filename:app --host 0.0.0.0 --port 6000 --reload
+    uvicorn.run(__name__ + ":app", host="0.0.0.0", port=3000, reload=True)
