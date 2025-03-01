@@ -1,12 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from models import Block
 
+import os
 import time
 
 app = FastAPI()
 
 
 blockchain = []
+
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 @app.get("/")
@@ -16,8 +21,10 @@ async def index():
 
 @app.post("/receiveBlock")
 async def receive_block(block: Block):
-    print(f"Received Block: {block.index}, Hash: {block.hash}")
-
+    clear_screen()
+    print(
+        f"---\nReceived Block Index: {block.index}\nHash: {block.hash}\nNonce: {block.nonce}\n---"
+    )
     if len(blockchain) > 0 and blockchain[-1].hash != block.previousHash:
         raise HTTPException(status_code=400, detail="Invalid previous hash!")
 
