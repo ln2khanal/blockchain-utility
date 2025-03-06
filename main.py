@@ -25,11 +25,39 @@ async def receive_block(block: Block):
     print(
         f"---\nReceived Block Index: {block.index}\nHash: {block.hash}\nNonce: {block.nonce}\n---"
     )
-    if len(blockchain) > 0 and blockchain[-1].hash != block.previousHash:
-        raise HTTPException(status_code=400, detail="Invalid previous hash!")
 
-    blockchain.append(block)
-    return {"message": "Block added successfully!", "block_index": block.index}
+    # If blockchain is empty, accept the block as the first block
+    if not blockchain:
+        blockchain.append(block)
+        return {
+            "message": "Genesis block added successfully!",
+            "block_index": block.index,
+        }
+
+    for i in range(len(blockchain)):
+        if blockchain[i].index == block.index:
+            raise HTTPException(
+                status_code=400, detail="Block with this index already exists!"
+            )
+
+        if blockchain[i].index > block.index:
+            if i == 0 or blockchain[i - 1].hash == block.previousHash:
+                blockchain.insert(i, block)
+                return {
+                    "message": "Block inserted successfully!",
+                    "block_index": block.index,
+                }
+            else:
+                raise HTTPException(status_code=400, detail="Invalid previous hash!")
+
+    if (
+        blockchain[-1].hash == block.previousHash
+        and blockchain[-1].index + 1 == block.index
+    ):
+        blockchain.append(block)
+        return {"message": "Block appended successfully!", "block_index": block.index}
+
+    raise HTTPException(status_code=400, detail="Invalid block sequence!")
 
 
 @app.get("/getBlockchain")
