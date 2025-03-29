@@ -1,1 +1,1 @@
-# blockchain-peer
+# Project utility scripts
