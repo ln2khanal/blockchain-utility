@@ -7,8 +7,6 @@ async def handle_client(reader, writer):
     clients.append(writer)
     try:
         while data := await reader.read(1024):
-            message = data.decode()
-            print(f"Received message: {message}")
             for client in clients:
                 if client != writer:
                     client.write(data)
